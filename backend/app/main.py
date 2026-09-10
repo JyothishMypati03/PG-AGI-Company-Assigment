@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.services.embedding_service import generate_embedding
@@ -14,6 +15,22 @@ from app.services.chat_service import generate_chat_response
 
 
 app = FastAPI(title="AI Resume & Job Assistant")
+
+
+# ==============================
+# CORS Configuration - UC10
+# ==============================
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ==============================
@@ -385,7 +402,9 @@ async def match_resume_with_job(
 # ==============================
 
 @app.post("/api/chat")
-async def chat(request: ChatRequest):
+async def chat(
+    request: ChatRequest
+):
 
     if not request.resume_context.strip():
         raise HTTPException(

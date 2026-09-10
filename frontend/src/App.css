@@ -1,0 +1,1400 @@
+/* ==========================================
+   Global App
+========================================== */
+
+.app {
+  min-height: 100vh;
+}
+
+
+/* ==========================================
+   Main Container
+========================================== */
+
+.upload-container {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 40px 20px;
+}
+
+
+/* ==========================================
+   Main Application Card
+========================================== */
+
+.upload-card {
+  width: 100%;
+  max-width: 900px;
+
+  padding: 50px;
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  border: 1px solid rgba(255, 255, 255, 0.9);
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.08);
+
+  backdrop-filter: blur(20px);
+}
+
+
+/* ==========================================
+   Main Icon
+========================================== */
+
+.icon {
+  width: 64px;
+  height: 64px;
+
+  margin: 0 auto 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: #f0f0f5;
+
+  font-size: 30px;
+}
+
+
+/* ==========================================
+   Main Heading
+========================================== */
+
+.upload-card h1 {
+  font-size: 34px;
+
+  font-weight: 700;
+
+  letter-spacing: -1px;
+
+  margin-bottom: 14px;
+}
+
+
+/* ==========================================
+   Subtitle
+========================================== */
+
+.subtitle {
+  max-width: 480px;
+
+  margin: 0 auto 35px;
+
+  color: #6e6e73;
+
+  font-size: 16px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   Resume Upload Box
+========================================== */
+
+.upload-box {
+  display: block;
+
+  padding: 40px 20px;
+
+  border: 2px dashed #c7c7cc;
+
+  border-radius: 20px;
+
+  cursor: pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+.upload-box:hover {
+  border-color: #8e8e93;
+
+  background: rgba(245, 245, 247, 0.7);
+}
+
+.upload-box input {
+  display: none;
+}
+
+
+/* ==========================================
+   Upload Icon
+========================================== */
+
+.upload-icon {
+  width: 52px;
+  height: 52px;
+
+  margin: 0 auto 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f2f2f7;
+
+  font-size: 25px;
+}
+
+
+/* ==========================================
+   Upload Text
+========================================== */
+
+.upload-box h2 {
+  font-size: 19px;
+
+  margin-bottom: 8px;
+}
+
+.upload-box p {
+  color: #8e8e93;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   Analyze Resume Button
+========================================== */
+
+.analyze-button {
+  width: 100%;
+
+  margin-top: 25px;
+
+  padding: 15px 20px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #1d1d1f;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+.analyze-button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.analyze-button:disabled {
+  opacity: 0.35;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   File Information
+========================================== */
+
+.file-info {
+  margin-top: 18px;
+
+  color: #8e8e93;
+
+  font-size: 13px;
+}
+
+
+/* ==========================================
+   Error Message
+========================================== */
+
+.error-message {
+  margin-top: 18px;
+
+  color: #d70015;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   Extracted Resume Text
+========================================== */
+
+.resume-result {
+  margin-top: 30px;
+
+  padding: 24px;
+
+  text-align: left;
+
+  background: rgba(245, 245, 247, 0.8);
+
+  border-radius: 18px;
+}
+
+.resume-result h2 {
+  margin-bottom: 15px;
+
+  font-size: 18px;
+}
+
+.resume-result pre {
+  max-height: 350px;
+
+  overflow-y: auto;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  color: #424245;
+}
+
+
+/* ==========================================
+   Resume Dashboard
+========================================== */
+
+.resume-dashboard {
+  margin-top: 30px;
+
+  text-align: left;
+}
+
+.dashboard-title {
+  margin-bottom: 20px;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.3px;
+}
+
+.dashboard-section {
+  margin-bottom: 20px;
+
+  padding: 24px;
+
+  background: rgba(255, 255, 255, 0.8);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+}
+
+.dashboard-section h3 {
+  margin-bottom: 16px;
+
+  font-size: 18px;
+}
+
+
+/* ==========================================
+   Personal Information
+========================================== */
+
+.personal-info h4 {
+  font-size: 22px;
+
+  margin-bottom: 6px;
+}
+
+.personal-info p {
+  margin-top: 6px;
+
+  color: #6e6e73;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   Skill Groups
+========================================== */
+
+.skill-groups {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.skill-group h4 {
+  margin-bottom: 8px;
+
+  font-size: 14px;
+
+  color: #6e6e73;
+}
+
+.skill-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+.skill {
+  padding: 7px 12px;
+
+  background: #f2f2f7;
+
+  border-radius: 20px;
+
+  font-size: 13px;
+
+  color: #424245;
+}
+
+
+/* ==========================================
+   Education
+========================================== */
+
+.dashboard-section ul {
+  padding-left: 20px;
+}
+
+.dashboard-section li {
+  margin-bottom: 8px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   Experience & Projects
+========================================== */
+
+.experience-card,
+.project-card {
+  padding: 16px;
+
+  margin-bottom: 12px;
+
+  background: #f8f8fa;
+
+  border-radius: 14px;
+}
+
+.experience-card:last-child,
+.project-card:last-child {
+  margin-bottom: 0;
+}
+
+.experience-card h4,
+.project-card h4 {
+  margin-bottom: 6px;
+
+  font-size: 16px;
+}
+
+.experience-card p,
+.project-card p {
+  margin-top: 6px;
+
+  color: #6e6e73;
+
+  line-height: 1.5;
+}
+
+.company {
+  font-weight: 600;
+}
+
+.duration {
+  font-size: 13px;
+}
+
+
+/* ==========================================
+   Technologies
+========================================== */
+
+.technology-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.technology {
+  padding: 6px 10px;
+
+  background: #f2f2f7;
+
+  border-radius: 14px;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================
+   Empty Text
+========================================== */
+
+.empty-text {
+  color: #8e8e93;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   Job Search
+========================================== */
+
+.job-search {
+  margin-top: 35px;
+
+  text-align: left;
+}
+
+.job-search-description {
+  margin-bottom: 20px;
+
+  color: #6e6e73;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   Job Search Box
+========================================== */
+
+.job-search-box {
+  display: flex;
+
+  gap: 10px;
+}
+
+.job-search-box input {
+  flex: 1;
+
+  padding: 14px 16px;
+
+  border: 1px solid #d2d2d7;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  font-size: 14px;
+
+  background: white;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.job-search-box input:focus {
+  border-color: #8e8e93;
+
+  box-shadow:
+    0 0 0 3px rgba(142, 142, 147, 0.08);
+}
+
+.job-search-box button {
+  padding: 14px 20px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #1d1d1f;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+.job-search-box button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.job-search-box button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   Job Results
+========================================== */
+
+.job-results {
+  margin-top: 25px;
+}
+
+.job-results > h3 {
+  margin-bottom: 15px;
+
+  font-size: 19px;
+}
+
+
+/* ==========================================
+   Job Card
+========================================== */
+
+.job-card {
+  margin-bottom: 15px;
+
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.job-card-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-bottom: 12px;
+}
+
+.job-card h4 {
+  font-size: 17px;
+
+  margin-bottom: 5px;
+}
+
+.job-company {
+  color: #6e6e73;
+
+  font-size: 14px;
+}
+
+.job-distance {
+  padding: 6px 10px;
+
+  background: #f2f2f7;
+
+  border-radius: 12px;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+.job-description {
+  color: #424245;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   Job Match Button
+========================================== */
+
+.match-button {
+  margin-top: 16px;
+
+  padding: 10px 16px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #1d1d1f;
+
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+.match-button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.match-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   Match Result
+========================================== */
+
+.match-result {
+  margin-top: 35px;
+
+  text-align: left;
+}
+
+
+/* ==========================================
+   Selected Job
+========================================== */
+
+.selected-job-card {
+  margin-bottom: 15px;
+
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+}
+
+.selected-job-card h3 {
+  margin-bottom: 6px;
+
+  font-size: 18px;
+}
+
+.selected-job-card p {
+  color: #6e6e73;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   Match Score
+========================================== */
+
+.match-score-card {
+  padding: 30px;
+
+  text-align: center;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 20px;
+}
+
+.match-score-card p {
+  color: #6e6e73;
+
+  margin-bottom: 8px;
+}
+
+.match-score-card h2 {
+  font-size: 42px;
+
+  margin-bottom: 8px;
+}
+
+.match-score-card span {
+  color: #6e6e73;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   Match Sections
+========================================== */
+
+.match-section {
+  margin-top: 15px;
+
+  padding: 22px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+}
+
+.match-section h3 {
+  margin-bottom: 15px;
+
+  font-size: 17px;
+}
+
+
+/* ==========================================
+   Score Rows
+========================================== */
+
+.score-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid #f0f0f2;
+}
+
+.score-row:last-child {
+  border-bottom: none;
+}
+
+
+/* ==========================================
+   Missing Skill
+========================================== */
+
+.missing-skill {
+  padding: 7px 12px;
+
+  background: #f2f2f7;
+
+  border-radius: 20px;
+
+  font-size: 13px;
+
+  color: #424245;
+}
+
+
+/* ==========================================
+   UC10.7 - Skill Gap
+========================================== */
+
+.skill-gap {
+  margin-top: 35px;
+
+  padding-top: 30px;
+
+  border-top: 1px solid #e5e5ea;
+
+  text-align: left;
+}
+
+.skill-gap-description {
+  margin-bottom: 20px;
+
+  color: #6e6e73;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   Skill Gap List
+========================================== */
+
+.skill-gap-list {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 15px;
+}
+
+
+/* ==========================================
+   Skill Gap Card
+========================================== */
+
+.skill-gap-card {
+  display: flex;
+
+  gap: 15px;
+
+  align-items: flex-start;
+
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.skill-gap-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ==========================================
+   Skill Gap Icon
+========================================== */
+
+.skill-gap-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f2f2f7;
+
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.skill-gap-card h4 {
+  margin-bottom: 8px;
+
+  font-size: 16px;
+}
+
+.skill-gap-card p {
+  color: #6e6e73;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   No Skill Gap
+========================================== */
+
+.skill-gap-success {
+  display: flex;
+
+  gap: 15px;
+
+  align-items: center;
+
+  padding: 20px;
+
+  background: rgba(245, 245, 247, 0.8);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+}
+
+.skill-gap-success-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f2f2f7;
+
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.skill-gap-success h4 {
+  margin-bottom: 6px;
+
+  font-size: 16px;
+}
+
+.skill-gap-success p {
+  color: #6e6e73;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   UC10.8 - AI Career Chat
+========================================== */
+
+.career-chat {
+  margin-top: 40px;
+
+  padding-top: 30px;
+
+  border-top: 1px solid #e5e5ea;
+
+  text-align: left;
+}
+
+.career-chat-description {
+  margin-bottom: 20px;
+
+  color: #6e6e73;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   Chat Suggestions
+========================================== */
+
+.chat-suggestions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.chat-suggestions button {
+  padding: 9px 14px;
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 20px;
+
+  background: #f8f8fa;
+
+  color: #424245;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.chat-suggestions button:hover {
+  background: #f2f2f7;
+
+  border-color: #d2d2d7;
+
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================
+   Chat Input
+========================================== */
+
+.chat-input-box {
+  padding: 18px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+}
+
+.chat-input-box textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 14px;
+
+  border: 1px solid #d2d2d7;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  resize: vertical;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  background: white;
+
+  color: #1d1d1f;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.chat-input-box textarea:focus {
+  border-color: #8e8e93;
+
+  box-shadow:
+    0 0 0 3px rgba(142, 142, 147, 0.08);
+}
+
+
+/* ==========================================
+   Chat Button
+========================================== */
+
+.chat-button {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 13px 18px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #1d1d1f;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+.chat-button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.chat-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   AI Answer
+========================================== */
+
+.chat-answer {
+  margin-top: 20px;
+
+  padding: 22px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+
+/* ==========================================
+   AI Answer Header
+========================================== */
+
+.chat-answer-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.chat-answer-header h3 {
+  font-size: 17px;
+
+  margin: 0;
+}
+
+.ai-icon {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f2f2f7;
+
+  border-radius: 10px;
+
+  font-size: 18px;
+}
+
+
+/* ==========================================
+   AI Answer Text
+========================================== */
+
+.chat-answer > p {
+  color: #424245;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+
+  margin: 0;
+}
+
+
+/* ==========================================
+   Retrieved Context
+========================================== */
+
+.chat-context {
+  margin-top: 20px;
+
+  padding: 20px;
+
+  background: rgba(245, 245, 247, 0.8);
+
+  border-radius: 18px;
+}
+
+.chat-context h3 {
+  margin-bottom: 15px;
+
+  font-size: 16px;
+}
+
+.context-card {
+  margin-bottom: 10px;
+
+  padding: 14px;
+
+  background: white;
+
+  border: 1px solid #e5e5ea;
+
+  border-radius: 12px;
+}
+
+.context-card:last-child {
+  margin-bottom: 0;
+}
+
+.context-card p {
+  margin: 0;
+
+  color: #6e6e73;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   Responsive Design
+========================================== */
+
+@media (max-width: 700px) {
+
+  .upload-container {
+    padding: 20px 12px;
+  }
+
+  .upload-card {
+    padding: 30px 20px;
+
+    border-radius: 22px;
+  }
+
+  .upload-card h1 {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+
+  /* Job Search */
+
+  .job-search-box {
+    flex-direction: column;
+  }
+
+  .job-search-box button {
+    width: 100%;
+  }
+
+
+  /* Job Cards */
+
+  .job-card-header {
+    flex-direction: column;
+  }
+
+  .job-distance {
+    align-self: flex-start;
+  }
+
+
+  /* Skill Gap */
+
+  .skill-gap-list {
+    grid-template-columns: 1fr;
+  }
+
+
+  /* Match Score */
+
+  .match-score-card h2 {
+    font-size: 36px;
+  }
+
+
+  /* Dashboard */
+
+  .dashboard-section,
+  .match-section {
+    padding: 18px;
+  }
+
+
+  /* Chat Suggestions */
+
+  .chat-suggestions {
+    flex-direction: column;
+  }
+
+  .chat-suggestions button {
+    width: 100%;
+
+    text-align: left;
+  }
+
+
+  /* Chat */
+
+  .career-chat {
+    margin-top: 30px;
+  }
+
+}
+
+
+/* ==========================================
+   Small Mobile Devices
+========================================== */
+
+@media (max-width: 450px) {
+
+  .upload-card {
+    padding: 25px 15px;
+  }
+
+  .upload-card h1 {
+    font-size: 24px;
+  }
+
+  .dashboard-title {
+    font-size: 21px;
+  }
+
+  .upload-box {
+    padding: 30px 15px;
+  }
+
+  .skill-gap-card {
+    padding: 16px;
+  }
+
+  .skill-gap-success {
+    align-items: flex-start;
+  }
+
+  .chat-input-box {
+    padding: 14px;
+  }
+
+  .chat-answer {
+    padding: 18px;
+  }
+
+}
