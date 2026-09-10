@@ -1,380 +1,1013 @@
-# UC2 – Resume Upload and PDF Extraction
+# UC3 — Gemini Structured Resume Analysis
 
-## Overview
+````markdown
+# UC3 — GEMINI STRUCTURED RESUME ANALYSIS
 
-UC2 extends the FastAPI backend to accept a resume PDF, validate the uploaded file, extract readable text from the PDF, and return the extracted resume text.
+AI Resume & Job Matching System
+--------------------------------
 
-The purpose of this use case is to create a reliable boundary between the uploaded resume and the later AI processing.
+Use Case 3: Convert Resume Text into Structured JSON
+using Google Gemini API and Pydantic validation.
 
-```text
-                    UC2 – RESUME PDF PROCESSING
+---
 
-                         Resume.pdf
-                              |
-                              v
-                    +-------------------+
-                    |  FastAPI Backend  |
-                    +---------+---------+
-                              |
-                              v
-                    +-------------------+
-                    |  File Validation  |
-                    +---------+---------+
-                              |
-                              v
-                    +-------------------+
-                    |   PDF Extraction  |
-                    |      (pypdf)      |
-                    +---------+---------+
-                              |
-                              v
-                    +-------------------+
-                    |    Resume Text    |
-                    +-------------------+
-```
+## 1. OBJECTIVE
 
-## Objective
+The objective of UC3 is to take the plain text extracted
+from a resume and use Gemini AI to convert that unstructured
+text into a well-defined structured JSON format.
 
-The main objectives of UC2 are:
+This allows the application to understand the resume in a
+consistent way and prepares the data for future features such
+as job matching, embeddings, semantic search and RAG.
 
-* Accept a resume PDF through FastAPI.
-* Validate the uploaded file.
-* Allow only PDF files.
-* Extract readable text from the PDF.
-* Handle invalid and corrupted files safely.
-* Test the API independently using Swagger.
-* Keep the backend ready for the next AI-based use case.
+---
 
-## Technology Used
+# 2. UC3 HIGH-LEVEL FLOW
 
 ```text
-Python
-FastAPI
-Uvicorn
-pypdf
-Swagger UI
-Git
-```
+                  RESUME PDF
+                      │
+                      ▼
+            ┌───────────────────┐
+            │       UC2         │
+            │  PDF Text Extract │
+            └─────────┬─────────┘
+                      │
+                      ▼
+              Resume Plain Text
+                      │
+                      ▼
+            ┌───────────────────┐
+            │       UC3         │
+            │    Gemini AI      │
+            └─────────┬─────────┘
+                      │
+                      ▼
+             Structured JSON
+                      │
+                      ▼
+            ┌───────────────────┐
+            │     Pydantic      │
+            │    Validation     │
+            └─────────┬─────────┘
+                      │
+                      ▼
+              Validated Resume
+                      │
+                      ▼
+                 API Response
+````
 
-## API
+---
+
+# 3. WHY DO WE NEED UC3?
+
+A resume is normally unstructured text.
+
+Example:
 
 ```text
-POST /api/resume/upload
+Jyothish Mypati
+
+Software Developer
+
+Skills:
+Java, Spring Boot, React, PostgreSQL
+
+Experience:
+Software Developer at XYZ
+
+Projects:
+AI Resume Analyzer
 ```
 
-The API accepts a resume PDF and returns the extracted text.
+It is difficult for the application to directly use this
+text for advanced processing.
 
-```text
-                    Client
-                      |
-                      | Upload Resume.pdf
-                      v
-              POST /api/resume/upload
-                      |
-                      v
-                 FastAPI
-                      |
-                      v
-               File Validation
-                      |
-             +--------+--------+
-             |                 |
-           Valid             Invalid
-             |                 |
-             v                 v
-       PDF Extraction       Error Response
-             |
-             v
-        Resume Text
-```
-
-## Successful Response
+UC3 converts it into structured data:
 
 ```json
 {
-    "status": "success",
-    "filename": "Resume.pdf",
-    "text": "Extracted resume text..."
+  "personal_information": {
+    "full_name": "Jyothish Mypati",
+    "title": "Software Developer"
+  },
+
+  "skills": {
+    "languages": ["Java"],
+    "backend": ["Spring Boot"],
+    "frontend": ["React"],
+    "databases": ["PostgreSQL"]
+  },
+
+  "experience": [],
+  "projects": []
 }
 ```
 
-## Project Structure
+Now the application can easily search, compare and process
+individual resume fields.
+
+---
+
+# 4. UC3 INPUT AND OUTPUT
 
 ```text
-backend/
-├── app/
-│   ├── main.py
-│   └── services/
-│       ├── __init__.py
-│       └── pdf_service.py
-├── tests/
-├── .venv/
-├── .gitignore
-└── requirements.txt
-```
-
-## PDF Extraction Flow
-
-```text
-Resume.pdf
-    |
-    v
-Upload File
-    |
-    v
-Validate File
-    |
-    v
-Check PDF Type
-    |
-    v
-Read PDF
-    |
-    v
-Read Each Page
-    |
-    v
-Extract Text
-    |
-    v
-Combine Text
-    |
-    v
-Return Resume Text
-```
-
-## Validation
-
-The uploaded file is checked before extraction.
-
-```text
-                  Uploaded File
-                       |
-                       v
-                Is File Present?
-                   /       \
-                 Yes        No
-                  |          |
-                  v          v
-             Is it PDF?   Validation
-               /    \       Error
-             Yes     No
-              |       |
-              v       v
-        Extract     400 Error
-          Text
-```
-
-Only PDF files are accepted.
-
-TXT, DOCX, and other unsupported file types are rejected.
-
-## Testing
-
-### TC 2.1 – Valid PDF
-
-```text
-Input:
-Valid Resume.pdf
-
-Expected:
-Readable resume text is returned.
-```
-
-```text
-Resume.pdf
-    |
-    v
-Validation
-    |
-    v
-PDF Extraction
-    |
-    v
+INPUT
+  │
+  │
+  ▼
 Resume Text
-    |
-    v
-200 OK
+  │
+  │
+  ▼
+Gemini AI
+  │
+  │
+  ▼
+OUTPUT
+  │
+  ▼
+Structured Resume JSON
 ```
 
-### TC 2.2 – Missing File
+### Input
+
+```json
+{
+  "resume_text": "Name: Jyothish Mypati..."
+}
+```
+
+### Output
+
+```json
+{
+  "status": "success",
+  "data": {
+    "personal_information": {},
+    "education": [],
+    "skills": {},
+    "experience": [],
+    "projects": []
+  }
+}
+```
+
+---
+
+# 5. API ENDPOINT
+
+## POST /api/resume/analyze
+
+This endpoint accepts resume text and sends it to Gemini
+for structured analysis.
+
+### URL
 
 ```text
-Input:
-No file
+http://127.0.0.1:8000/api/resume/analyze
+```
+
+### Method
+
+```text
+POST
+```
+
+### Content-Type
+
+```text
+application/json
+```
+
+---
+
+# 6. API REQUEST
+
+Example:
+
+```json
+{
+  "resume_text": "Name: Jyothish Mypati\nSkills: Java, Spring Boot, React"
+}
+```
+
+---
+
+# 7. API RESPONSE
+
+Example:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "personal_information": {
+      "full_name": "Jyothish Mypati",
+      "title": null,
+      "phone": null,
+      "email": null,
+      "linkedin": null,
+      "github": null,
+      "website": null
+    },
+
+    "education": [],
+
+    "skills": {
+      "languages": [
+        "Java"
+      ],
+
+      "frontend": [
+        "React"
+      ],
+
+      "backend": [
+        "Spring Boot"
+      ],
+
+      "databases": [],
+
+      "tools": [],
+
+      "cloud": [],
+
+      "data_engineering": []
+    },
+
+    "experience": [],
+
+    "projects": []
+  }
+}
+```
+
+---
+
+# 8. GEMINI PROCESSING
+
+The application sends a controlled prompt to Gemini.
+
+The prompt tells Gemini:
+
+```text
+Extract only information supported by the resume.
+
+Do not invent missing information.
+
+Return personal information,
+education,
+skills,
+experience
+and projects.
+
+Return the result as valid JSON.
+```
+
+The resume text is then added to the prompt.
+
+```text
+             Resume Text
+                  │
+                  ▼
+        ┌──────────────────┐
+        │   Resume Prompt  │
+        │                  │
+        │ Instructions +   │
+        │ Resume Text      │
+        └────────┬─────────┘
+                 │
+                 ▼
+            Gemini API
+                 │
+                 ▼
+          JSON Response
+```
+
+---
+
+# 9. STRUCTURED OUTPUT
+
+UC3 uses Gemini structured output.
+
+The application requests:
+
+```text
+application/json
+```
+
+and provides:
+
+```text
+ResumeSchema
+```
+
+to define the expected structure.
+
+```text
+              Gemini
+                 │
+                 ▼
+            JSON Output
+                 │
+                 ▼
+        ┌─────────────────┐
+        │  ResumeSchema   │
+        │                 │
+        │ Pydantic Model  │
+        └────────┬────────┘
+                 │
+                 ▼
+          Validated Data
+```
+
+---
+
+# 10. PYDANTIC SCHEMA
+
+The main schema is:
+
+```text
+ResumeSchema
+│
+├── personal_information
+│
+├── education
+│
+├── skills
+│
+├── experience
+│
+└── projects
+```
+
+---
+
+## Personal Information
+
+```text
+PersonalInformation
+│
+├── full_name
+├── title
+├── phone
+├── email
+├── linkedin
+├── github
+└── website
+```
+
+---
+
+## Skills
+
+```text
+Skills
+│
+├── languages
+├── frontend
+├── backend
+├── databases
+├── tools
+├── cloud
+└── data_engineering
+```
+
+---
+
+## Experience
+
+```text
+Experience
+│
+├── title
+├── company
+├── duration
+└── description
+```
+
+---
+
+## Projects
+
+```text
+Project
+│
+├── name
+├── description
+└── technologies
+```
+
+---
+
+# 11. PROJECT STRUCTURE
+
+```text
+RESUME-ANALYSIS/
+│
+├── README.md
+│
+├── .gitignore
+│
+└── backend/
+    │
+    ├── app/
+    │   │
+    │   ├── main.py
+    │   │
+    │   ├── schemas/
+    │   │   ├── __init__.py
+    │   │   └── resume_schema.py
+    │   │
+    │   └── services/
+    │       ├── __init__.py
+    │       ├── pdf_service.py
+    │       └── gemini_service.py
+    │
+    ├── tests/
+    │
+    ├── requirements.txt
+    │
+    └── .env
+```
+
+### Important
+
+`.env` is a local configuration file.
+
+It must NOT be uploaded to GitHub.
+
+---
+
+# 12. IMPORTANT FILES
+
+## main.py
+
+Responsible for:
+
+```text
+API Endpoint
+     │
+     ▼
+Request Validation
+     │
+     ▼
+Gemini Service
+     │
+     ▼
+Response
+```
+
+---
+
+## gemini_service.py
+
+Responsible for:
+
+```text
+Resume Text
+     │
+     ▼
+Gemini Prompt
+     │
+     ▼
+Gemini API
+     │
+     ▼
+JSON
+     │
+     ▼
+Pydantic Validation
+```
+
+---
+
+## resume_schema.py
+
+Responsible for defining the expected structure:
+
+```text
+ResumeSchema
+     │
+     ├── PersonalInformation
+     ├── Skills
+     ├── Experience
+     └── Project
+```
+
+---
+
+# 13. RETRY MECHANISM
+
+Temporary AI service failures can occur.
+
+UC3 therefore attempts the Gemini request up to 3 times.
+
+```text
+                 Gemini Request
+                       │
+                       ▼
+                  Attempt 1
+                       │
+                ┌──────┴──────┐
+                │             │
+              Success        Fail
+                │             │
+                ▼             ▼
+              Return       Attempt 2
+                              │
+                       ┌──────┴──────┐
+                       │             │
+                     Success        Fail
+                       │             │
+                       ▼             ▼
+                     Return       Attempt 3
+                                    │
+                              ┌─────┴─────┐
+                              │           │
+                           Success       Fail
+                              │           │
+                              ▼           ▼
+                            Return     Error
+```
+
+The retry delays are:
+
+```text
+Attempt 1 → wait 2 seconds
+Attempt 2 → wait 4 seconds
+Attempt 3 → return error
+```
+
+---
+
+# 14. ERROR HANDLING
+
+UC3 should not expose internal Gemini errors to the client.
+
+If Gemini fails after all retry attempts:
+
+```text
+Gemini Error
+     │
+     ▼
+Exception
+     │
+     ▼
+FastAPI catches error
+     │
+     ▼
+HTTP 500
+```
+
+Response:
+
+```json
+{
+  "detail": "Unable to analyze resume"
+}
+```
+
+The server should continue running.
+
+---
+
+# 15. EMPTY RESUME VALIDATION
+
+If the user sends:
+
+```json
+{
+  "resume_text": ""
+}
+```
+
+the API should reject the request.
 
 Expected:
-Controlled validation error.
-```
 
 ```text
-No File
-   |
-   v
-Validation
-   |
-   v
-Error Response
-```
-
-### TC 2.3 – Unsupported File
-
-```text
-Input:
-TXT / DOCX
-
-Expected:
-Unsupported file type error.
-```
-
-```text
-TXT / DOCX
-     |
-     v
-File Validation
-     |
-     v
-Not a PDF
-     |
-     v
 400 Bad Request
 ```
 
-### TC 2.4 – Corrupted PDF
+Response:
 
-```text
-Input:
-Corrupted PDF
-
-Expected:
-Controlled extraction error.
+```json
+{
+  "detail": "Resume text is required"
+}
 ```
 
-```text
-Corrupted PDF
-      |
-      v
-PDF Reader
-      |
-      v
-Extraction Error
-      |
-      v
-Controlled Error Response
-```
+---
 
-### TC 2.5 – Multi-page PDF
+# 16. TEST CASES
+
+## TC3.1 — Normal Resume
+
+### Input
+
+Valid resume text.
+
+### Expected
 
 ```text
-Input:
-Multi-page Resume.pdf
-
-Expected:
-Readable text from all readable pages is returned.
+200 OK
 ```
+
+Structured resume JSON is returned.
+
+---
+
+## TC3.2 — Missing Email
+
+### Input
+
+Resume without email.
+
+### Expected
 
 ```text
-             Resume.pdf
-                  |
-        +---------+---------+
-        |         |         |
-        v         v         v
-      Page 1    Page 2    Page 3
-        |         |         |
-        v         v         v
-       Text      Text      Text
-        |         |         |
-        +---------+---------+
-                  |
-                  v
-          Combined Resume Text
+200 OK
 ```
 
-## API Testing
+Email should remain:
 
-Swagger UI is used to test the upload API independently before connecting the React frontend.
+```text
+null
+```
+
+The AI must not invent an email address.
+
+---
+
+## TC3.3 — No Projects
+
+### Input
+
+Resume without projects.
+
+### Expected
+
+```json
+{
+  "projects": []
+}
+```
+
+No project should be invented.
+
+---
+
+## TC3.4 — Gemini Failure
+
+### Input
+
+Simulated Gemini/API failure.
+
+### Expected
+
+```text
+500 Internal Server Error
+```
+
+Response:
+
+```json
+{
+  "detail": "Unable to analyze resume"
+}
+```
+
+Backend should remain running.
+
+---
+
+## TC3.5 — Empty Resume
+
+### Input
+
+```json
+{
+  "resume_text": ""
+}
+```
+
+### Expected
+
+```text
+400 Bad Request
+```
+
+---
+
+# 17. UC2 → UC3 INTEGRATION
+
+UC3 uses the output of UC2.
+
+```text
+             RESUME PDF
+                 │
+                 ▼
+        ┌─────────────────┐
+        │       UC2       │
+        │ PDF Extraction  │
+        └────────┬────────┘
+                 │
+                 ▼
+           Resume Text
+                 │
+                 ▼
+        ┌─────────────────┐
+        │       UC3       │
+        │   Gemini AI     │
+        └────────┬────────┘
+                 │
+                 ▼
+        Structured Resume
+                 │
+                 ▼
+        Pydantic Validation
+                 │
+                 ▼
+           JSON Response
+```
+
+This is the first major AI processing stage of the project.
+
+---
+
+# 18. ENVIRONMENT CONFIGURATION
+
+Create:
+
+```text
+backend/.env
+```
+
+Add:
+
+```text
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+The actual API key should never be written directly
+inside Python source code.
+
+The `.env` file should be ignored by Git.
+
+---
+
+# 19. REQUIRED PACKAGES
+
+UC3 requires the Gemini SDK and environment variable support.
+
+Install:
+
+```bash
+pip install google-genai
+pip install python-dotenv
+```
+
+Or install everything:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# 20. RUN THE APPLICATION
+
+Go to:
+
+```text
+RESUME-ANALYSIS/backend
+```
+
+Activate virtual environment:
+
+```powershell
+.venv\Scripts\activate
+```
+
+Run FastAPI:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Open Swagger:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-Swagger testing flow:
+---
+
+# 21. TESTING THROUGH SWAGGER
+
+Open:
 
 ```text
-Open Swagger
-     |
-     v
-POST /api/resume/upload
-     |
-     v
+POST /api/resume/analyze
+```
+
+Click:
+
+```text
 Try it out
-     |
-     v
-Choose Resume.pdf
-     |
-     v
+```
+
+Enter:
+
+```json
+{
+  "resume_text": "Name: Jyothish Mypati\nSkills: Java, Spring Boot, React"
+}
+```
+
+Click:
+
+```text
 Execute
-     |
-     v
-View Response
 ```
 
-## Important Limitation
-
-PDF extraction is not the same as document understanding.
-
-A resume may contain multiple columns, tables, icons, images, and unusual formatting.
-
-Because of the way PDF documents store text and layout information, the extracted text may sometimes appear in a different order from the visual document.
-
-This limitation is accepted in UC2 because the main purpose of this use case is to learn reliable file handling and PDF text extraction.
-
-More advanced document parsing can be introduced later if required.
-
-## Result
+Expected:
 
 ```text
-                  UC2 RESULT
-
-                 Resume.pdf
-                     |
-                     v
-              FastAPI Upload
-                     |
-                     v
-              File Validation
-                     |
-                     v
-              PDF Extraction
-                     |
-                     v
-               Resume Text
-                     |
-                     v
-               API Testing
-                     |
-                     v
-                UC2 Complete
+200 OK
 ```
 
-## Git
+---
 
-UC2 is developed in a separate branch:
+# 22. COMPLETE SYSTEM PROGRESS
 
 ```text
-uc2-pdf-extraction
+UC1
+Basic FastAPI
+   │
+   ▼
+UC2
+PDF Text Extraction
+   │
+   ▼
+UC3
+Gemini Structured Analysis
+   │
+   ▼
+UC4
+Job Description Processing
+   │
+   ▼
+UC5
+Embeddings + Vector DB
+   │
+   ▼
+UC6
+Semantic Search
+   │
+   ▼
+UC7
+RAG
+   │
+   ▼
+UC8
+Resume / Job Matching
+   │
+   ▼
+UC9
+AI Career Assistant
+   │
+   ▼
+UC10
+React Dashboard
 ```
 
-Example commit:
+---
+
+# 23. CURRENT STATUS
 
 ```text
-feat: implement UC2 resume PDF extraction
+UC1  Basic FastAPI Backend              [DONE]
+
+UC2  Resume PDF Extraction              [DONE]
+
+UC3  Gemini Structured Analysis         [CURRENT]
+
+UC4  Job Description Processing         [NEXT]
+
+UC5  Embeddings + Vector Database       [PENDING]
+
+UC6  Semantic Job Search                [PENDING]
+
+UC7  RAG                                [PENDING]
+
+UC8  Resume / Job Matching              [PENDING]
+
+UC9  AI Career Assistant                [PENDING]
+
+UC10 React Dashboard                    [PENDING]
 ```
 
-## Next Use Case
+---
+
+# 24. GIT BRANCH
+
+UC3 branch:
 
 ```text
-UC3 – Resume Text to Structured Data
+uc3-gemini-structured-resume
 ```
 
-UC3 will use the extracted resume text and introduce Gemini to convert the unstructured text into structured information such as skills, education, experience, and other relevant resume details.
+Recommended commit:
+
+```text
+feat: implement UC3 structured resume analysis
+```
+
+Git workflow:
+
+```text
+main
+ │
+ └── dev
+      │
+      ├── uc1-basic-fastapi
+      │
+      ├── uc2-pdf-extraction
+      │
+      └── uc3-gemini-structured-resume
+```
+
+After UC3 testing is complete:
+
+```text
+UC3 Branch
+     │
+     ▼
+Commit
+     │
+     ▼
+Push to GitHub
+     │
+     ▼
+Merge into dev
+```
+
+---
+
+# 25. DEVELOPMENT PRINCIPLES
+
+This project follows a use-case based development approach.
+
+Each use case should have:
+
+```text
+Use Case
+   │
+   ├── Implementation
+   │
+   ├── Happy Tests
+   │
+   ├── Sad Tests
+   │
+   ├── Error Handling
+   │
+   ├── Git Commit
+   │
+   └── Merge into dev
+```
+
+Important principles:
+
+* Keep use cases separated.
+* Write readable code.
+* Use meaningful names.
+* Validate external AI responses.
+* Never expose API keys.
+* Handle errors gracefully.
+* Test before committing.
+* Keep Git commits focused.
+* Avoid unnecessary code duplication.
+
+---
+
+# END OF UC3
+
+````
+
+### Recommended file location
+
+Because this is specifically the **UC3 documentation**, I suggest:
+
+```text
+RESUME-ANALYSIS/
+│
+├── README.md                  ← Overall project
+│
+└── backend/
+    └── README_UC3.md          ← UC3 detailed documentation
+````
