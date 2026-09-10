@@ -58,6 +58,21 @@ Job Description:
 {job_description}
 """
 
+RAG_PROMPT = (
+    "You are an AI career assistant.\n"
+    "Answer using the provided context.\n"
+    "Do not invent unsupported facts.\n\n"
+
+    "RESUME CONTEXT:\n"
+    "{resume_context}\n\n"
+
+    "JOB CONTEXT:\n"
+    "{job_context}\n\n"
+
+    "QUESTION:\n"
+    "{question}"
+)
+
 
 def extract_resume_information(resume_text: str) -> dict:
 
@@ -128,6 +143,45 @@ def extract_job_information(job_description: str) -> dict:
 
             print(
                 f"GEMINI JOB ATTEMPT {attempt + 1} FAILED:",
+                repr(e)
+            )
+
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+            else:
+                raise
+
+
+def generate_rag_answer(
+    resume_context: str,
+    job_context: str,
+    question: str
+) -> str:
+
+    if not question.strip():
+        raise ValueError("Question is required")
+
+    prompt = RAG_PROMPT.format(
+        resume_context=resume_context,
+        job_context=job_context,
+        question=question
+    )
+
+    for attempt in range(3):
+
+        try:
+
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt
+            )
+
+            return response.text.strip()
+
+        except Exception as e:
+
+            print(
+                f"GEMINI RAG ATTEMPT {attempt + 1} FAILED:",
                 repr(e)
             )
 

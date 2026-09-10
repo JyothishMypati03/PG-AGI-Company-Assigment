@@ -8,6 +8,7 @@ from app.services.gemini_service import (
     extract_resume_information,
     extract_job_information
 )
+from app.services.rag_service import generate_rag_response
 
 
 app = FastAPI(title="AI Resume & Job Assistant")
@@ -30,12 +31,19 @@ class JobSearchRequest(BaseModel):
     top_k: int = 3
 
 
+class RAGRequest(BaseModel):
+    resume_context: str
+    question: str
+    top_k: int = 3
+
+
 # ==============================
 # Health Check - UC1
 # ==============================
 
 @app.get("/api/health")
 def health_check():
+
     return {
         "status": "success",
         "message": "Resume AI Backend is running"
@@ -64,7 +72,10 @@ async def upload_resume(file: UploadFile = File(...)):
     file_content = await file.read()
 
     try:
-        extracted_text = extract_text_from_pdf(file_content)
+
+        extracted_text = extract_text_from_pdf(
+            file_content
+        )
 
         if not extracted_text:
             raise HTTPException(
@@ -83,7 +94,10 @@ async def upload_resume(file: UploadFile = File(...)):
 
     except Exception as e:
 
-        print("PDF EXTRACTION ERROR:", repr(e))
+        print(
+            "PDF EXTRACTION ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=400,
@@ -96,7 +110,9 @@ async def upload_resume(file: UploadFile = File(...)):
 # ==============================
 
 @app.post("/api/resume/analyze")
-async def analyze_resume(request: ResumeRequest):
+async def analyze_resume(
+    request: ResumeRequest
+):
 
     if not request.resume_text.strip():
         raise HTTPException(
@@ -117,7 +133,10 @@ async def analyze_resume(request: ResumeRequest):
 
     except Exception as e:
 
-        print("GEMINI RESUME ERROR:", repr(e))
+        print(
+            "GEMINI RESUME ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,
@@ -130,7 +149,9 @@ async def analyze_resume(request: ResumeRequest):
 # ==============================
 
 @app.post("/api/job/analyze")
-async def analyze_job(request: JobRequest):
+async def analyze_job(
+    request: JobRequest
+):
 
     if not request.job_description.strip():
         raise HTTPException(
@@ -151,7 +172,10 @@ async def analyze_job(request: JobRequest):
 
     except Exception as e:
 
-        print("GEMINI JOB ERROR:", repr(e))
+        print(
+            "GEMINI JOB ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,
@@ -160,11 +184,13 @@ async def analyze_job(request: JobRequest):
 
 
 # ==============================
-# Semantic Job Search - UC5
+# Semantic Job Search - UC5 / UC6
 # ==============================
 
 @app.post("/api/jobs/search")
-async def search_jobs(request: JobSearchRequest):
+async def search_jobs(
+    request: JobSearchRequest
+):
 
     if not request.query.strip():
         raise HTTPException(
@@ -191,10 +217,25 @@ async def search_jobs(request: JobSearchRequest):
 
         search_results = []
 
-        ids = results.get("ids", [[]])[0]
-        documents = results.get("documents", [[]])[0]
-        metadatas = results.get("metadatas", [[]])[0]
-        distances = results.get("distances", [[]])[0]
+        ids = results.get(
+            "ids",
+            [[]]
+        )[0]
+
+        documents = results.get(
+            "documents",
+            [[]]
+        )[0]
+
+        metadatas = results.get(
+            "metadatas",
+            [[]]
+        )[0]
+
+        distances = results.get(
+            "distances",
+            [[]]
+        )[0]
 
         for index in range(len(ids)):
 
@@ -214,9 +255,65 @@ async def search_jobs(request: JobSearchRequest):
 
     except Exception as e:
 
-        print("JOB SEARCH ERROR:", repr(e))
+        print(
+            "JOB SEARCH ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,
             detail="Unable to search jobs"
+        )
+
+
+# ==============================
+# RAG Answer - UC7
+# ==============================
+
+@app.post("/api/rag/answer")
+async def rag_answer(
+    request: RAGRequest
+):
+
+    if not request.resume_context.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Resume context is required"
+        )
+
+    if not request.question.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Question is required"
+        )
+
+    if request.top_k < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="top_k must be at least 1"
+        )
+
+    try:
+
+        result = generate_rag_response(
+            resume_context=request.resume_context,
+            question=request.question,
+            top_k=request.top_k
+        )
+
+        return {
+            "status": "success",
+            "data": result
+        }
+
+    except Exception as e:
+
+        print(
+            "RAG ERROR:",
+            repr(e)
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to generate RAG response"
         )
