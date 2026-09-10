@@ -1,6 +1,8 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
 
+from app.services.embedding_service import generate_embedding
+from app.services.vector_service import search_similar_documents
 from app.services.pdf_service import extract_text_from_pdf
 from app.services.gemini_service import (
     extract_resume_information,
@@ -21,6 +23,11 @@ class ResumeRequest(BaseModel):
 
 class JobRequest(BaseModel):
     job_description: str
+
+
+class JobSearchRequest(BaseModel):
+    query: str
+    top_k: int = 3
 
 
 # ==============================
@@ -149,4 +156,52 @@ async def analyze_job(request: JobRequest):
         raise HTTPException(
             status_code=500,
             detail="Unable to analyze job description"
+        )
+
+
+# ==============================
+# Semantic Job Search - UC5
+# ==============================
+
+@app.post("/api/jobs/search")
+async def search_jobs(request: JobSearchRequest):
+
+    if not request.query.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Search query is required"
+        )
+
+    if request.top_k < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="top_k must be at least 1"
+        )
+
+    try:
+
+        # Convert search text into an embedding
+        query_embedding = generate_embedding(
+            request.query
+        )
+
+        # Search ChromaDB for similar documents
+        results = search_similar_documents(
+            query_embedding,
+            request.top_k
+        )
+
+        return {
+            "status": "success",
+            "query": request.query,
+            "results": results
+        }
+
+    except Exception as e:
+
+        print("JOB SEARCH ERROR:", repr(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to search jobs"
         )

@@ -97,3 +97,6 @@ cache/
 *.db
 *.sqlite
 *.sqlite3
+
+# ChromaDB local vector database
+backend/app/vector_db/
