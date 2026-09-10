@@ -10,6 +10,7 @@ from app.services.gemini_service import (
 )
 from app.services.rag_service import generate_rag_response
 from app.services.match_service import calculate_match
+from app.services.chat_service import generate_chat_response
 
 
 app = FastAPI(title="AI Resume & Job Assistant")
@@ -41,6 +42,12 @@ class RAGRequest(BaseModel):
 class MatchRequest(BaseModel):
     resume: dict
     job: dict
+
+
+class ChatRequest(BaseModel):
+    resume_context: str
+    question: str
+    top_k: int = 3
 
 
 # ==============================
@@ -370,4 +377,55 @@ async def match_resume_with_job(
         raise HTTPException(
             status_code=500,
             detail="Unable to calculate resume and job match"
+        )
+
+
+# ==============================
+# AI Career Chat - UC9
+# ==============================
+
+@app.post("/api/chat")
+async def chat(request: ChatRequest):
+
+    if not request.resume_context.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Resume context is required"
+        )
+
+    if not request.question.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Question is required"
+        )
+
+    if request.top_k < 1:
+        raise HTTPException(
+            status_code=400,
+            detail="top_k must be at least 1"
+        )
+
+    try:
+
+        result = generate_chat_response(
+            resume_context=request.resume_context,
+            question=request.question,
+            top_k=request.top_k
+        )
+
+        return {
+            "status": "success",
+            "data": result
+        }
+
+    except Exception as e:
+
+        print(
+            "CHAT ERROR:",
+            repr(e)
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to generate chat response"
         )
