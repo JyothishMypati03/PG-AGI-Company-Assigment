@@ -1,116 +1,56 @@
-# UC4 — Job Description Processing
+# UC5 — Embeddings & Vector Database
 
 ## Objective
 
-Convert an unstructured job description into structured JSON using Gemini AI.
+Convert resume/job text into embeddings and store them in ChromaDB for semantic search.
 
-### Flow
-
-```text
-Job Description
-      ↓
-   FastAPI
-      ↓
-Gemini Service
-      ↓
-   Gemini AI
-      ↓
-  JobSchema
-      ↓
-Structured Job JSON
-```
-
-## Extracted Information
+## Flow
 
 ```text
-Job Title
-Company
-Required Skills
-Preferred Skills
-Experience Required
-Responsibilities
+Text
+ ↓
+Embedding Model
+ ↓
+Vector
+ ↓
+ChromaDB
+ ↓
+Similarity Search
 ```
 
-### Example
+## Implemented
+
+* Generated embeddings using `all-MiniLM-L6-v2`
+* Stored text, embeddings, IDs, and metadata in ChromaDB
+* Implemented semantic similarity search
+* Added FastAPI endpoint:
+
+```text
+POST /api/jobs/search
+```
+
+### Example Request
 
 ```json
 {
-  "job_title": "Java Backend Developer",
-  "company": null,
-  "required_skills": ["Java", "Spring Boot", "SQL"],
-  "preferred_skills": ["Docker", "AWS"],
-  "experience_required": "0-2 years",
-  "responsibilities": []
+  "query": "Java Spring Boot backend engineer",
+  "top_k": 3
 }
 ```
 
-## API
+### Result
 
-```text
-POST /api/job/analyze
-```
-
-Request:
-
-```json
-{
-  "job_description": "Java Backend Developer with 0-2 years experience..."
-}
-```
-
-## Key Engineering Decision
-
-UC4 **reuses the Gemini service from UC3** instead of duplicating Gemini API code.
-
-```text
-             Gemini Service
-              /          \
-             /            \
-        UC3 Resume       UC4 Job
-          ↓                ↓
-    ResumeSchema        JobSchema
-```
+Returns the most semantically similar job documents with their metadata and similarity distance.
 
 ## Tests
 
-```text
-✓ Normal job description
-✓ Missing company
-✓ Empty description
-✓ No preferred skills
-✓ Ambiguous description
-✓ Gemini failure
-```
+* Valid semantic search → 200 ✅
+* Unrelated search → tested ✅
+* Empty query → 400
+* Invalid `top_k` → 400
 
-## Project Structure
+## Key Learning
 
-```text
-backend/
-├── app/
-│   ├── main.py
-│   ├── schemas/
-│   │   ├── resume_schema.py
-│   │   └── job_schema.py
-│   └── services/
-│       ├── pdf_service.py
-│       └── gemini_service.py
-└── README_UC4.md
-```
+> Embeddings help find semantically similar information, while ChromaDB stores and retrieves the vectors efficiently.
 
-## Git
-
-**Branch:**
-
-```text
-uc4-job-description
-```
-
-**Commit:**
-
-```text
-feat: implement UC4 job description processing
-```
-
-### Next
-
-**UC5 — Embeddings + Vector Database**
+**Next:** UC6 — Semantic Job Search
