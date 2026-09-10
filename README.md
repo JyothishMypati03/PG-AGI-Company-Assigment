@@ -1,47 +1,32 @@
-
-# UC7 — RAG Pipeline
+# UC8 — Resume and Job Matching
 
 ## Objective
-Retrieve relevant jobs from ChromaDB and use Gemini to generate answers using resume and job context.
+
+Compare a structured resume with a selected job and generate a transparent match indicator.
 
 ## Flow
 
-Question → Embedding → ChromaDB → Top-K Jobs → Context → Gemini → Answer
+Resume + Job
+→ Skill Matching
+→ Experience Matching
+→ Education Matching
+→ Final Score
+→ Recommendation
 
 ## Implemented
 
-- Added RAG service.
-- Integrated ChromaDB retrieval with Gemini.
-- Added `POST /api/rag/answer`.
-- Added input validation.
+- Matched required skills.
+- Identified missing skills.
+- Added skill aliases such as PostgreSQL → SQL.
+- Compared candidate and required experience.
+- Compared education requirements.
+- Calculated a deterministic match score.
+- Added `POST /api/match`.
+- Added match recommendation.
 
-## Example Request
+## Score
 
-```json
-{
-  "resume_context": "Java developer with Spring Boot and PostgreSQL.",
-  "question": "How well does this job match my skills?",
-  "top_k": 3
-}
-````
-
-## Tests
-
-* Valid request → 200
-* Empty resume → 400
-* Empty question → 400
-* Invalid `top_k` → 400
-
-## Key Learning
-
-RAG = Retrieval + Context + Generation
-
-## Git
-
-Branch: `uc7-rag`
-
-Commit: `feat: implement UC7 rag pipeline`
-
-## Next
-
-UC8 — Resume and Job Matching
+```text
+Skill       → 60%
+Experience  → 25%
+Education   → 15%

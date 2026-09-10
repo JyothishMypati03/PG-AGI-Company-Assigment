@@ -39,18 +39,18 @@ JOB_PROMPT = """
 Extract only information supported by the job description.
 Do not invent missing information.
 
-Extract:
+Return the following information:
 
-- job title
-- company
-- required skills
-- preferred skills
-- experience requirements
-- responsibilities
+- Job title
+- Company
+- Required skills
+- Preferred skills
+- Experience required
+- Education required
+- Responsibilities
 
-Keep required skills and preferred skills separate.
-Do not move a skill from one category to another unless
-the job description clearly supports it.
+If education requirements are not mentioned,
+return education_required as null.
 
 Return the result as valid JSON.
 

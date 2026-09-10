@@ -9,6 +9,7 @@ from app.services.gemini_service import (
     extract_job_information
 )
 from app.services.rag_service import generate_rag_response
+from app.services.match_service import calculate_match
 
 
 app = FastAPI(title="AI Resume & Job Assistant")
@@ -37,6 +38,11 @@ class RAGRequest(BaseModel):
     top_k: int = 3
 
 
+class MatchRequest(BaseModel):
+    resume: dict
+    job: dict
+
+
 # ==============================
 # Health Check - UC1
 # ==============================
@@ -55,7 +61,9 @@ def health_check():
 # ==============================
 
 @app.post("/api/resume/upload")
-async def upload_resume(file: UploadFile = File(...)):
+async def upload_resume(
+    file: UploadFile = File(...)
+):
 
     if not file.filename:
         raise HTTPException(
@@ -316,4 +324,50 @@ async def rag_answer(
         raise HTTPException(
             status_code=500,
             detail="Unable to generate RAG response"
+        )
+
+
+# ==============================
+# Resume and Job Matching - UC8
+# ==============================
+
+@app.post("/api/match")
+async def match_resume_with_job(
+    request: MatchRequest
+):
+
+    if not request.resume:
+        raise HTTPException(
+            status_code=400,
+            detail="Resume data is required"
+        )
+
+    if not request.job:
+        raise HTTPException(
+            status_code=400,
+            detail="Job data is required"
+        )
+
+    try:
+
+        match_result = calculate_match(
+            resume=request.resume,
+            job=request.job
+        )
+
+        return {
+            "status": "success",
+            "data": match_result
+        }
+
+    except Exception as e:
+
+        print(
+            "MATCHING ERROR:",
+            repr(e)
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to calculate resume and job match"
         )
