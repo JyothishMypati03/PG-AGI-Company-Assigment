@@ -1,0 +1,229 @@
+[1mdiff --git a/backend/app/main.py b/backend/app/main.py[m
+[1mindex fb79faa..145b072 100644[m
+[1m--- a/backend/app/main.py[m
+[1m+++ b/backend/app/main.py[m
+[36m@@ -2,14 +2,30 @@[m [mfrom fastapi import FastAPI, File, UploadFile, HTTPException[m
+ from pydantic import BaseModel[m
+ [m
+ from app.services.pdf_service import extract_text_from_pdf[m
+[31m-from app.services.gemini_service import extract_resume_information[m
+[32m+[m[32mfrom app.services.gemini_service import ([m
+[32m+[m[32m    extract_resume_information,[m
+[32m+[m[32m    extract_job_information[m
+[32m+[m[32m)[m
+ [m
+ [m
+[32m+[m[32mapp = FastAPI(title="AI Resume & Job Assistant")[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# ==============================[m
+[32m+[m[32m# Request Models[m
+[32m+[m[32m# ==============================[m
+[32m+[m
+ class ResumeRequest(BaseModel):[m
+     resume_text: str[m
+ [m
+[31m-app = FastAPI(title="AI Resume & Job Assistant")[m
+ [m
+[32m+[m[32mclass JobRequest(BaseModel):[m
+[32m+[m[32m    job_description: str[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# ==============================[m
+[32m+[m[32m# Health Check - UC1[m
+[32m+[m[32m# ==============================[m
+ [m
+ @app.get("/api/health")[m
+ def health_check():[m
+[36m@@ -19,8 +35,13 @@[m [mdef health_check():[m
+     }[m
+ [m
+ [m
+[32m+[m[32m# ==============================[m
+[32m+[m[32m# Resume PDF Upload - UC2[m
+[32m+[m[32m# ==============================[m
+[32m+[m
+ @app.post("/api/resume/upload")[m
+ async def upload_resume(file: UploadFile = File(...)):[m
+[32m+[m
+     if not file.filename:[m
+         raise HTTPException([m
+             status_code=400,[m
+[36m@@ -53,13 +74,20 @@[m [masync def upload_resume(file: UploadFile = File(...)):[m
+     except HTTPException:[m
+         raise[m
+ [m
+[31m-    except Exception:[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m
+[32m+[m[32m        print("PDF EXTRACTION ERROR:", repr(e))[m
+[32m+[m
+         raise HTTPException([m
+             status_code=400,[m
+             detail="Unable to extract text from the PDF"[m
+         )[m
+ [m
+ [m
+[32m+[m[32m# ==============================[m
+[32m+[m[32m# Resume Analysis - UC3[m
+[32m+[m[32m# ==============================[m
+[32m+[m
+ @app.post("/api/resume/analyze")[m
+ async def analyze_resume(request: ResumeRequest):[m
+ [m
+[36m@@ -70,6 +98,7 @@[m [masync def analyze_resume(request: ResumeRequest):[m
+         )[m
+ [m
+     try:[m
+[32m+[m
+         structured_resume = extract_resume_information([m
+             request.resume_text[m
+         )[m
+[36m@@ -80,9 +109,44 @@[m [masync def analyze_resume(request: ResumeRequest):[m
+         }[m
+ [m
+     except Exception as e:[m
+[31m-        print("GEMINI ERROR:", repr(e))[m
+[32m+[m
+[32m+[m[32m        print("GEMINI RESUME ERROR:", repr(e))[m
+ [m
+         raise HTTPException([m
+             status_code=500,[m
+             detail="Unable to analyze resume"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# ==============================[m
+[32m+[m[32m# Job Description Analysis - UC4[m
+[32m+[m[32m# ==============================[m
+[32m+[m
+[32m+[m[32m@app.post("/api/job/analyze")[m
+[32m+[m[32masync def analyze_job(request: JobRequest):[m
+[32m+[m
+[32m+[m[32m    if not request.job_description.strip():[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=400,[m
+[32m+[m[32m            detail="Job description is required"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    try:[m
+[32m+[m
+[32m+[m[32m        structured_job = extract_job_information([m
+[32m+[m[32m            request.job_description[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        return {[m
+[32m+[m[32m            "status": "success",[m
+[32m+[m[32m            "data": structured_job[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m
+[32m+[m[32m        print("GEMINI JOB ERROR:", repr(e))[m
+[32m+[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=500,[m
+[32m+[m[32m            detail="Unable to analyze job description"[m
+         )[m
+\ No newline at end of file[m
+[1mdiff --git a/backend/app/services/gemini_service.py b/backend/app/services/gemini_service.py[m
+[1mindex 136cb84..e3a4946 100644[m
+[1m--- a/backend/app/services/gemini_service.py[m
+[1m+++ b/backend/app/services/gemini_service.py[m
+[36m@@ -7,6 +7,7 @@[m [mfrom google import genai[m
+ from google.genai import types[m
+ [m
+ from app.schemas.resume_schema import ResumeSchema[m
+[32m+[m[32mfrom app.schemas.job_schema import JobSchema[m
+ [m
+ [m
+ load_dotenv()[m
+[36m@@ -24,7 +25,8 @@[m [mRESUME_PROMPT = """[m
+ Extract only information supported by the resume.[m
+ Do not invent missing information.[m
+ [m
+[31m-Return personal information, education, skills, experience and projects.[m
+[32m+[m[32mReturn personal information, education, skills,[m
+[32m+[m[32mexperience and projects.[m
+ [m
+ Return the result as valid JSON.[m
+ [m
+[36m@@ -33,6 +35,30 @@[m [mResume:[m
+ """[m
+ [m
+ [m
+[32m+[m[32mJOB_PROMPT = """[m
+[32m+[m[32mExtract only information supported by the job description.[m
+[32m+[m[32mDo not invent missing information.[m
+[32m+[m
+[32m+[m[32mExtract:[m
+[32m+[m
+[32m+[m[32m- job title[m
+[32m+[m[32m- company[m
+[32m+[m[32m- required skills[m
+[32m+[m[32m- preferred skills[m
+[32m+[m[32m- experience requirements[m
+[32m+[m[32m- responsibilities[m
+[32m+[m
+[32m+[m[32mKeep required skills and preferred skills separate.[m
+[32m+[m[32mDo not move a skill from one category to another unless[m
+[32m+[m[32mthe job description clearly supports it.[m
+[32m+[m
+[32m+[m[32mReturn the result as valid JSON.[m
+[32m+[m
+[32m+[m[32mJob Description:[m
+[32m+[m[32m{job_description}[m
+[32m+[m[32m"""[m
+[32m+[m
+[32m+[m
+ def extract_resume_information(resume_text: str) -> dict:[m
+ [m
+     prompt = RESUME_PROMPT.format([m
+[36m@@ -62,7 +88,46 @@[m [mdef extract_resume_information(resume_text: str) -> dict:[m
+         except Exception as e:[m
+ [m
+             print([m
+[31m-                f"GEMINI ATTEMPT {attempt + 1} FAILED:",[m
+[32m+[m[32m                f"GEMINI RESUME ATTEMPT {attempt + 1} FAILED:",[m
+[32m+[m[32m                repr(e)[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m            if attempt < 2:[m
+[32m+[m[32m                time.sleep(2 * (attempt + 1))[m
+[32m+[m[32m            else:[m
+[32m+[m[32m                raise[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef extract_job_information(job_description: str) -> dict:[m
+[32m+[m
+[32m+[m[32m    prompt = JOB_PROMPT.format([m
+[32m+[m[32m        job_description=job_description[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    for attempt in range(3):[m
+[32m+[m
+[32m+[m[32m        try:[m
+[32m+[m[32m            response = client.models.generate_content([m
+[32m+[m[32m                model="gemini-3.6-flash",[m
+[32m+[m[32m                contents=prompt,[m
+[32m+[m[32m                config=types.GenerateContentConfig([m
+[32m+[m[32m                    response_mime_type="application/json",[m
+[32m+[m[32m                    response_schema=JobSchema[m
+[32m+[m[32m                )[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m            job_data = json.loads(response.text)[m
+[32m+[m
+[32m+[m[32m            validated_job = JobSchema.model_validate([m
+[32m+[m[32m                job_data[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m            return validated_job.model_dump()[m
+[32m+[m
+[32m+[m[32m        except Exception as e:[m
+[32m+[m
+[32m+[m[32m            print([m
+[32m+[m[32m                f"GEMINI JOB ATTEMPT {attempt + 1} FAILED:",[m
+                 repr(e)[m
+             )[m
+ [m
