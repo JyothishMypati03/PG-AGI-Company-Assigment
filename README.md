@@ -1,224 +1,380 @@
-# UC1 – Basic FastAPI Backend
+# UC2 – Resume Upload and PDF Extraction
 
 ## Overview
 
-The first use case establishes the basic backend foundation for the AI Resume & Job Matching System.
+UC2 extends the FastAPI backend to accept a resume PDF, validate the uploaded file, extract readable text from the PDF, and return the extracted resume text.
 
-Python, FastAPI, and Uvicorn are used to create and run a simple backend application.
-
-The main purpose of this use case is to verify that the backend can start successfully, handle an HTTP request, and return a JSON response.
-
-AI features such as Gemini, PDF processing, embeddings, vector databases, RAG, and job matching are not included in UC1.
-
-## What Was Implemented
-
-A Python virtual environment was created to isolate the project dependencies.
-
-FastAPI was used to create the backend application.
-
-Uvicorn was used to run the FastAPI application.
-
-A simple Health Check API was created.
-
-API:
-
-GET /api/health
-
-The Health Check API verifies whether the backend is running successfully.
-
-## Visual Flow
+The purpose of this use case is to create a reliable boundary between the uploaded resume and the later AI processing.
 
 ```text
-                    UC1 – BASIC FASTAPI BACKEND
+                    UC2 – RESUME PDF PROCESSING
 
-                              Client
-                                |
-                                | HTTP Request
-                                v
-                    +-----------------------+
-                    |    FastAPI Backend    |
-                    |                       |
-                    |      /api/health      |
-                    +-----------+-----------+
-                                |
-                                v
-                    +-----------------------+
-                    |     Health Check      |
-                    |                       |
-                    |    Backend Status     |
-                    +-----------+-----------+
-                                |
-                                | JSON Response
-                                v
-                    +-----------------------+
-                    |        Client         |
-                    |                       |
-                    |  "Backend is Running" |
-                    +-----------------------+
+                         Resume.pdf
+                              |
+                              v
+                    +-------------------+
+                    |  FastAPI Backend  |
+                    +---------+---------+
+                              |
+                              v
+                    +-------------------+
+                    |  File Validation  |
+                    +---------+---------+
+                              |
+                              v
+                    +-------------------+
+                    |   PDF Extraction  |
+                    |      (pypdf)      |
+                    +---------+---------+
+                              |
+                              v
+                    +-------------------+
+                    |    Resume Text    |
+                    +-------------------+
 ```
 
-## API Details
+## Objective
 
-Endpoint:
+The main objectives of UC2 are:
+
+* Accept a resume PDF through FastAPI.
+* Validate the uploaded file.
+* Allow only PDF files.
+* Extract readable text from the PDF.
+* Handle invalid and corrupted files safely.
+* Test the API independently using Swagger.
+* Keep the backend ready for the next AI-based use case.
+
+## Technology Used
 
 ```text
-GET /api/health
+Python
+FastAPI
+Uvicorn
+pypdf
+Swagger UI
+Git
 ```
 
-URL:
+## API
 
 ```text
-http://127.0.0.1:8000/api/health
+POST /api/resume/upload
 ```
 
-Expected Response:
+The API accepts a resume PDF and returns the extracted text.
+
+```text
+                    Client
+                      |
+                      | Upload Resume.pdf
+                      v
+              POST /api/resume/upload
+                      |
+                      v
+                 FastAPI
+                      |
+                      v
+               File Validation
+                      |
+             +--------+--------+
+             |                 |
+           Valid             Invalid
+             |                 |
+             v                 v
+       PDF Extraction       Error Response
+             |
+             v
+        Resume Text
+```
+
+## Successful Response
 
 ```json
 {
     "status": "success",
-    "message": "Resume AI Backend is running"
+    "filename": "Resume.pdf",
+    "text": "Extracted resume text..."
 }
 ```
-
-Expected Status:
-
-```text
-200 OK
-```
-
-## Development Flow
-
-```text
-        Python
-           |
-           v
-   Virtual Environment
-           |
-           v
-        FastAPI
-           |
-           v
-        Uvicorn
-           |
-           v
-   Health Check API
-           |
-           v
-        Testing
-           |
-           v
-      UC1 Complete
-           |
-           v
-   UC2 – PDF Processing
-```
-
-## API Testing
-
-Swagger UI was used to test the API.
-
-Swagger URL:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-The API was tested with both valid and invalid requests.
-
-### Happy Test
-
-```text
-/api/health
-     |
-     v
-  200 OK
-```
-
-The valid request returns the expected success response.
-
-### Sad Test
-
-```text
-/api/hello
-     |
-     v
-404 Not Found
-```
-
-The invalid request returns `404 Not Found`, while the backend continues running normally.
 
 ## Project Structure
 
 ```text
 backend/
 ├── app/
-│   └── main.py
+│   ├── main.py
+│   └── services/
+│       ├── __init__.py
+│       └── pdf_service.py
 ├── tests/
 ├── .venv/
 ├── .gitignore
 └── requirements.txt
 ```
 
-## Dependencies
-
-The main dependencies used in UC1 are:
+## PDF Extraction Flow
 
 ```text
-FastAPI
-Uvicorn
+Resume.pdf
+    |
+    v
+Upload File
+    |
+    v
+Validate File
+    |
+    v
+Check PDF Type
+    |
+    v
+Read PDF
+    |
+    v
+Read Each Page
+    |
+    v
+Extract Text
+    |
+    v
+Combine Text
+    |
+    v
+Return Resume Text
 ```
 
-The installed dependencies are recorded in:
+## Validation
+
+The uploaded file is checked before extraction.
 
 ```text
-requirements.txt
+                  Uploaded File
+                       |
+                       v
+                Is File Present?
+                   /       \
+                 Yes        No
+                  |          |
+                  v          v
+             Is it PDF?   Validation
+               /    \       Error
+             Yes     No
+              |       |
+              v       v
+        Extract     400 Error
+          Text
 ```
 
-## Git
+Only PDF files are accepted.
 
-A dedicated Git branch was created for UC1.
+TXT, DOCX, and other unsupported file types are rejected.
+
+## Testing
+
+### TC 2.1 – Valid PDF
 
 ```text
-uc1-basic-backend
+Input:
+Valid Resume.pdf
+
+Expected:
+Readable resume text is returned.
 ```
 
-The implementation and testing changes were committed to Git.
+```text
+Resume.pdf
+    |
+    v
+Validation
+    |
+    v
+PDF Extraction
+    |
+    v
+Resume Text
+    |
+    v
+200 OK
+```
+
+### TC 2.2 – Missing File
+
+```text
+Input:
+No file
+
+Expected:
+Controlled validation error.
+```
+
+```text
+No File
+   |
+   v
+Validation
+   |
+   v
+Error Response
+```
+
+### TC 2.3 – Unsupported File
+
+```text
+Input:
+TXT / DOCX
+
+Expected:
+Unsupported file type error.
+```
+
+```text
+TXT / DOCX
+     |
+     v
+File Validation
+     |
+     v
+Not a PDF
+     |
+     v
+400 Bad Request
+```
+
+### TC 2.4 – Corrupted PDF
+
+```text
+Input:
+Corrupted PDF
+
+Expected:
+Controlled extraction error.
+```
+
+```text
+Corrupted PDF
+      |
+      v
+PDF Reader
+      |
+      v
+Extraction Error
+      |
+      v
+Controlled Error Response
+```
+
+### TC 2.5 – Multi-page PDF
+
+```text
+Input:
+Multi-page Resume.pdf
+
+Expected:
+Readable text from all readable pages is returned.
+```
+
+```text
+             Resume.pdf
+                  |
+        +---------+---------+
+        |         |         |
+        v         v         v
+      Page 1    Page 2    Page 3
+        |         |         |
+        v         v         v
+       Text      Text      Text
+        |         |         |
+        +---------+---------+
+                  |
+                  v
+          Combined Resume Text
+```
+
+## API Testing
+
+Swagger UI is used to test the upload API independently before connecting the React frontend.
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Swagger testing flow:
+
+```text
+Open Swagger
+     |
+     v
+POST /api/resume/upload
+     |
+     v
+Try it out
+     |
+     v
+Choose Resume.pdf
+     |
+     v
+Execute
+     |
+     v
+View Response
+```
+
+## Important Limitation
+
+PDF extraction is not the same as document understanding.
+
+A resume may contain multiple columns, tables, icons, images, and unusual formatting.
+
+Because of the way PDF documents store text and layout information, the extracted text may sometimes appear in a different order from the visual document.
+
+This limitation is accepted in UC2 because the main purpose of this use case is to learn reliable file handling and PDF text extraction.
+
+More advanced document parsing can be introduced later if required.
 
 ## Result
 
 ```text
-                  UC1 RESULT
+                  UC2 RESULT
 
-                 Python
-                    |
-                    v
-             FastAPI Backend
-                    |
-                    v
-             Health Check API
-                    |
-                    v
-              API Testing
-              /          \
-             /            \
-            v              v
-        200 OK          404 Not Found
-        Success         Invalid Route
-            \              /
-             \            /
-              v          v
-             Backend Verified
-                    |
-                    v
-              UC1 Completed
+                 Resume.pdf
+                     |
+                     v
+              FastAPI Upload
+                     |
+                     v
+              File Validation
+                     |
+                     v
+              PDF Extraction
+                     |
+                     v
+               Resume Text
+                     |
+                     v
+               API Testing
+                     |
+                     v
+                UC2 Complete
 ```
 
-The basic FastAPI backend has been successfully created, started, and tested.
+## Git
+
+UC2 is developed in a separate branch:
+
+```text
+uc2-pdf-extraction
+```
+
+Example commit:
+
+```text
+feat: implement UC2 resume PDF extraction
+```
 
 ## Next Use Case
 
 ```text
-UC2 – Resume PDF Upload and Text Extraction
+UC3 – Resume Text to Structured Data
 ```
 
-UC2 will extend the backend by adding resume PDF upload and text extraction functionality.
+UC3 will use the extracted resume text and introduce Gemini to convert the unstructured text into structured information such as skills, education, experience, and other relevant resume details.
