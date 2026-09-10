@@ -1,7 +1,12 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from pydantic import BaseModel
 
 from app.services.pdf_service import extract_text_from_pdf
+from app.services.gemini_service import extract_resume_information
 
+
+class ResumeRequest(BaseModel):
+    resume_text: str
 
 app = FastAPI(title="AI Resume & Job Assistant")
 
@@ -52,4 +57,32 @@ async def upload_resume(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=400,
             detail="Unable to extract text from the PDF"
+        )
+
+
+@app.post("/api/resume/analyze")
+async def analyze_resume(request: ResumeRequest):
+
+    if not request.resume_text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Resume text is required"
+        )
+
+    try:
+        structured_resume = extract_resume_information(
+            request.resume_text
+        )
+
+        return {
+            "status": "success",
+            "data": structured_resume
+        }
+
+    except Exception as e:
+        print("GEMINI ERROR:", repr(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to analyze resume"
         )
