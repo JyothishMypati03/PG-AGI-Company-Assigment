@@ -180,21 +180,36 @@ async def search_jobs(request: JobSearchRequest):
 
     try:
 
-        # Convert search text into an embedding
         query_embedding = generate_embedding(
             request.query
         )
 
-        # Search ChromaDB for similar documents
         results = search_similar_documents(
             query_embedding,
             request.top_k
         )
 
+        search_results = []
+
+        ids = results.get("ids", [[]])[0]
+        documents = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        distances = results.get("distances", [[]])[0]
+
+        for index in range(len(ids)):
+
+            search_results.append({
+                "id": ids[index],
+                "text": documents[index],
+                "metadata": metadatas[index],
+                "distance": distances[index]
+            })
+
         return {
             "status": "success",
             "query": request.query,
-            "results": results
+            "top_k": request.top_k,
+            "results": search_results
         }
 
     except Exception as e:

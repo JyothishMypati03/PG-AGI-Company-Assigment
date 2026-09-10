@@ -1,56 +1,16 @@
-# UC5 — Embeddings & Vector Database
+# UC6 — Semantic Job Search
 
 ## Objective
 
-Convert resume/job text into embeddings and store them in ChromaDB for semantic search.
+Convert a user's search query into an embedding and retrieve the most relevant jobs using vector similarity.
 
 ## Flow
 
 ```text
-Text
- ↓
-Embedding Model
- ↓
-Vector
- ↓
+User Query
+    ↓
+Query Embedding
+    ↓
 ChromaDB
- ↓
-Similarity Search
-```
-
-## Implemented
-
-* Generated embeddings using `all-MiniLM-L6-v2`
-* Stored text, embeddings, IDs, and metadata in ChromaDB
-* Implemented semantic similarity search
-* Added FastAPI endpoint:
-
-```text
-POST /api/jobs/search
-```
-
-### Example Request
-
-```json
-{
-  "query": "Java Spring Boot backend engineer",
-  "top_k": 3
-}
-```
-
-### Result
-
-Returns the most semantically similar job documents with their metadata and similarity distance.
-
-## Tests
-
-* Valid semantic search → 200 ✅
-* Unrelated search → tested ✅
-* Empty query → 400
-* Invalid `top_k` → 400
-
-## Key Learning
-
-> Embeddings help find semantically similar information, while ChromaDB stores and retrieves the vectors efficiently.
-
-**Next:** UC6 — Semantic Job Search
+    ↓
+Top-K Similar Jobs
